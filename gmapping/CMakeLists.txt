@@ -9,7 +9,11 @@ include_directories(${Boost_INCLUDE_DIRS} ${catkin_INCLUDE_DIRS})
 
 include_directories(src)
 
-catkin_package()
+catkin_package(
+    DEPENDS Boost
+    INCLUDE_DIRS src 
+    LIBRARIES slam_gmapping_lib
+    )
 
 add_executable(slam_gmapping src/slam_gmapping.cpp src/main.cpp)
 target_link_libraries(slam_gmapping ${Boost_LIBRARIES} ${catkin_LIBRARIES})
@@ -23,10 +27,18 @@ if(catkin_EXPORTED_TARGETS)
 add_dependencies(slam_gmapping_replay ${catkin_EXPORTED_TARGETS})
 endif()
 
-install(TARGETS slam_gmapping slam_gmapping_replay
+add_library(slam_gmapping_lib src/slam_gmapping.cpp)
+target_link_libraries(slam_gmapping_lib ${Boost_LIBRARIES} ${catkin_LIBRARIES})
+
+install(TARGETS slam_gmapping slam_gmapping_lib slam_gmapping_replay
   ARCHIVE DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
   LIBRARY DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
   RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
+)
+
+install(DIRECTORY src/
+  DESTINATION ${CATKIN_PACKAGE_INCLUDE_DESTINATION}
+  FILES_MATCHING PATTERN "*.h"
 )
 
 if(CATKIN_ENABLE_TESTING)

@@ -157,6 +157,7 @@ void SlamGMapping::init()
   ROS_ASSERT(tfB_);
 
   gsp_laser_ = NULL;
+  num_readings_per_scan_ = 0;
   gsp_laser_angle_increment_ = 0.0;
   gsp_odom_ = NULL;
 
@@ -451,6 +452,7 @@ SlamGMapping::initMapper(const sensor_msgs::LaserScan& scan)
     ROS_INFO("Laser is mounted upside down.");
   }
 
+  num_readings_per_scan_ = scan.ranges.size();
   angle_min_ = orientationFactor * scan.angle_min;
   angle_max_ = orientationFactor * scan.angle_max;
   gsp_laser_angle_increment_ = orientationFactor * scan.angle_increment;
@@ -641,6 +643,27 @@ SlamGMapping::computePoseEntropy()
       entropy += it->weight/weight_total * log(it->weight/weight_total);
   }
   return -entropy;
+}
+
+void SlamGMapping::initMatcher(GMapping::ScanMatcher &matcher) {
+  double* laser_angles = new double[num_readings_per_scan_];
+  double theta = angle_min_;
+
+  for(unsigned int i = 0; i < num_readings_per_scan_; i++)
+  {
+    if (gsp_laser_angle_increment_ < 0)
+        laser_angles[num_readings_per_scan_ - i - 1] = theta;
+    else
+        laser_angles[i] = theta;
+    theta += gsp_laser_angle_increment_;
+  }
+
+  matcher.setLaserParameters(num_readings_per_scan_, laser_angles, 
+                             gsp_laser_->getPose());
+  delete[] laser_angles;
+  matcher.setlaserMaxRange(maxRange_);
+  matcher.setusableRange(maxUrange_);
+  matcher.setgenerateMap(true);
 }
 
 void

@@ -49,6 +49,13 @@ class SlamGMapping
                      nav_msgs::GetMap::Response &res);
     void publishLoop(double transform_publish_period);
 
+    void initMatcher(GMapping::ScanMatcher &matcher);
+    GMapping::GridSlamProcessor* gsp_;
+    double xmin_;
+    double ymin_;
+    double xmax_;
+    double ymax_;
+    double delta_;
   private:
     ros::NodeHandle node_;
     ros::Publisher entropy_publisher_;
@@ -60,12 +67,12 @@ class SlamGMapping
     tf::MessageFilter<sensor_msgs::LaserScan>* scan_filter_;
     tf::TransformBroadcaster* tfB_;
 
-    GMapping::GridSlamProcessor* gsp_;
     GMapping::RangeSensor* gsp_laser_;
     double gsp_laser_angle_increment_;
     double angle_min_;
     double angle_max_;
     unsigned int gsp_laser_beam_count_;
+    unsigned int num_readings_per_scan_;
     GMapping::OdometrySensor* gsp_odom_;
 
     bool got_first_scan_;
@@ -116,11 +123,6 @@ class SlamGMapping
     double temporalUpdate_;
     double resampleThreshold_;
     int particles_;
-    double xmin_;
-    double ymin_;
-    double xmax_;
-    double ymax_;
-    double delta_;
     double occ_thresh_;
     double llsamplerange_;
     double llsamplestep_;

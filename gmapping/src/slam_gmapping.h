@@ -56,7 +56,8 @@ class SlamGMapping
     double xmax_;
     double ymax_;
     double delta_;
-  private:
+
+  protected:
     ros::NodeHandle node_;
     ros::Publisher entropy_publisher_;
     ros::Publisher sst_;
@@ -97,7 +98,7 @@ class SlamGMapping
 
     void updateMap(const sensor_msgs::LaserScan& scan);
     bool getOdomPose(GMapping::OrientedPoint& gmap_pose, const ros::Time& t);
-    bool initMapper(const sensor_msgs::LaserScan& scan);
+    virtual bool initMapper(const sensor_msgs::LaserScan& scan);
     bool addScan(const sensor_msgs::LaserScan& scan, GMapping::OrientedPoint& gmap_pose);
     double computePoseEntropy();
     
